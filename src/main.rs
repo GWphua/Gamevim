@@ -84,7 +84,6 @@ fn main() -> Result<()> {
 }
 
 const DEFAULT_SEED: u64 = 7;
-const LAVA_EVERY: usize = 3;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct Progress {
@@ -254,6 +253,7 @@ struct GridSpec {
     goal: Pos,
     command_budget: usize,
     lava: bool,
+    lava_interval_ms: Option<u64>,
     generated: bool,
     mastery: bool,
 }
@@ -294,12 +294,13 @@ fn lesson_one() -> Lesson {
                 lesson: 1,
                 required_to_unlock_next: false,
                 kind: LevelKind::Grid(GridSpec {
-                    width: 13,
-                    height: 7,
-                    start: Pos { x: 1, y: 5 },
-                    goal: Pos { x: 11, y: 1 },
-                    command_budget: 24,
+                    width: 25,
+                    height: 11,
+                    start: Pos { x: 2, y: 9 },
+                    goal: Pos { x: 22, y: 1 },
+                    command_budget: 34,
                     lava: false,
+                    lava_interval_ms: None,
                     generated: false,
                     mastery: false,
                 }),
@@ -310,12 +311,13 @@ fn lesson_one() -> Lesson {
                 lesson: 1,
                 required_to_unlock_next: false,
                 kind: LevelKind::Grid(GridSpec {
-                    width: 17,
-                    height: 7,
-                    start: Pos { x: 1, y: 3 },
-                    goal: Pos { x: 15, y: 3 },
-                    command_budget: 7,
+                    width: 33,
+                    height: 13,
+                    start: Pos { x: 2, y: 6 },
+                    goal: Pos { x: 30, y: 6 },
+                    command_budget: 12,
                     lava: false,
+                    lava_interval_ms: None,
                     generated: true,
                     mastery: false,
                 }),
@@ -326,12 +328,13 @@ fn lesson_one() -> Lesson {
                 lesson: 1,
                 required_to_unlock_next: true,
                 kind: LevelKind::Grid(GridSpec {
-                    width: 19,
-                    height: 12,
-                    start: Pos { x: 1, y: 10 },
-                    goal: Pos { x: 17, y: 1 },
-                    command_budget: 22,
+                    width: 43,
+                    height: 23,
+                    start: Pos { x: 2, y: 20 },
+                    goal: Pos { x: 40, y: 1 },
+                    command_budget: 38,
                     lava: true,
+                    lava_interval_ms: Some(3_400),
                     generated: true,
                     mastery: false,
                 }),
@@ -342,12 +345,13 @@ fn lesson_one() -> Lesson {
                 lesson: 1,
                 required_to_unlock_next: false,
                 kind: LevelKind::Grid(GridSpec {
-                    width: 27,
-                    height: 14,
-                    start: Pos { x: 1, y: 12 },
-                    goal: Pos { x: 25, y: 1 },
-                    command_budget: 26,
+                    width: 57,
+                    height: 29,
+                    start: Pos { x: 2, y: 26 },
+                    goal: Pos { x: 54, y: 1 },
+                    command_budget: 48,
                     lava: true,
+                    lava_interval_ms: Some(2_700),
                     generated: true,
                     mastery: true,
                 }),
@@ -368,9 +372,13 @@ fn lesson_two() -> Lesson {
                 lesson: 2,
                 required_to_unlock_next: false,
                 kind: LevelKind::Token(TokenSpec {
-                    lines: vec!["let courier_patch = old_bug.fix();"],
-                    targets: vec![(0, 4), (0, 18), (0, 28)],
-                    command_budget: 12,
+                    lines: vec![
+                        "let courier_patch = old_bug.fix();",
+                        "let route = courier_patch.next_stop();",
+                        "dispatch(route);",
+                    ],
+                    targets: vec![(0, 4), (0, 18), (0, 28), (1, 12), (2, 0)],
+                    command_budget: 18,
                     timer_seconds: None,
                     generated: false,
                 }),
@@ -381,9 +389,12 @@ fn lesson_two() -> Lesson {
                 lesson: 2,
                 required_to_unlock_next: false,
                 kind: LevelKind::Token(TokenSpec {
-                    lines: vec!["route.alpha_beta.map(|fix| fix.apply())"],
-                    targets: vec![(0, 6), (0, 17), (0, 28), (0, 37)],
-                    command_budget: 14,
+                    lines: vec![
+                        "route.alpha_beta.map(|fix| fix.apply())",
+                        "packet.queue[fix.index()].seal();",
+                    ],
+                    targets: vec![(0, 6), (0, 17), (0, 28), (0, 37), (1, 7), (1, 20)],
+                    command_budget: 20,
                     timer_seconds: None,
                     generated: true,
                 }),
@@ -397,10 +408,11 @@ fn lesson_two() -> Lesson {
                     lines: vec![
                         "fn deliver_patch(queue: &mut Vec<Job>) {",
                         "    queue.iter_mut().for_each(|job| job.fix());",
+                        "    report_status(queue.len());",
                         "}",
                     ],
-                    targets: vec![(0, 3), (0, 17), (1, 10), (1, 32), (1, 42)],
-                    command_budget: 21,
+                    targets: vec![(0, 3), (0, 17), (1, 10), (1, 32), (1, 42), (2, 4), (2, 18)],
+                    command_budget: 28,
                     timer_seconds: None,
                     generated: true,
                 }),
@@ -415,10 +427,11 @@ fn lesson_two() -> Lesson {
                         "panic: patch lost at src/courier.rs:42",
                         "  at deliver::route::vault",
                         "  at main::dispatch",
+                        "  at runtime::wake_terminal",
                     ],
-                    targets: vec![(0, 7), (0, 24), (0, 39), (1, 5), (1, 20), (2, 6)],
-                    command_budget: 24,
-                    timer_seconds: Some(90),
+                    targets: vec![(0, 7), (0, 24), (0, 39), (1, 5), (1, 20), (2, 6), (3, 15)],
+                    command_budget: 30,
+                    timer_seconds: Some(75),
                     generated: true,
                 }),
             },
@@ -438,10 +451,20 @@ fn lesson_three() -> Lesson {
                 lesson: 3,
                 required_to_unlock_next: false,
                 kind: LevelKind::Edit(EditSpec {
-                    start: vec!["let mesage = \"ship\";", "let extra word = true;"],
-                    expected: vec!["let message = \"ship\";", "let extra = true;"],
-                    cursor: Pos { x: 7, y: 0 },
-                    command_budget: 30,
+                    start: vec![
+                        "fn patch() {",
+                        "    let mesage = \"ship\";",
+                        "    let extra word = true;",
+                        "}",
+                    ],
+                    expected: vec![
+                        "fn patch() {",
+                        "    let message = \"ship\";",
+                        "    let extra = true;",
+                        "}",
+                    ],
+                    cursor: Pos { x: 10, y: 1 },
+                    command_budget: 42,
                     timer_seconds: None,
                 }),
             },
@@ -451,10 +474,20 @@ fn lesson_three() -> Lesson {
                 lesson: 3,
                 required_to_unlock_next: false,
                 kind: LevelKind::Edit(EditSpec {
-                    start: vec!["retun patch.count()", "let mode = \"sloww\";"],
-                    expected: vec!["return patch.count()", "let mode = \"slow\";"],
-                    cursor: Pos { x: 4, y: 0 },
-                    command_budget: 32,
+                    start: vec![
+                        "fn count_patch() -> usize {",
+                        "    retun patch.count()",
+                        "}",
+                        "let mode = \"sloww\";",
+                    ],
+                    expected: vec![
+                        "fn count_patch() -> usize {",
+                        "    return patch.count()",
+                        "}",
+                        "let mode = \"slow\";",
+                    ],
+                    cursor: Pos { x: 8, y: 1 },
+                    command_budget: 46,
                     timer_seconds: None,
                 }),
             },
@@ -468,16 +501,18 @@ fn lesson_three() -> Lesson {
                         "fn mainn() {",
                         "    prnitln!(\"patched\");",
                         "    let stale_word flag = true;",
+                        "    dispatch_noww();",
                         "}",
                     ],
                     expected: vec![
                         "fn main() {",
                         "    println!(\"patched\");",
                         "    let flag = true;",
+                        "    dispatch_now();",
                         "}",
                     ],
                     cursor: Pos { x: 7, y: 0 },
-                    command_budget: 46,
+                    command_budget: 58,
                     timer_seconds: Some(180),
                 }),
             },
@@ -623,6 +658,7 @@ struct GridState {
     command_budget: usize,
     lava_rows: usize,
     lava: bool,
+    lava_interval: Option<Duration>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -855,17 +891,12 @@ impl GameSession {
             (PlayState::Grid(grid), ParsedCommand::Motion(kind, count)) => {
                 self.moves_history.extend(std::iter::repeat_n(kind, count));
                 grid.apply_motion(kind, count);
-                if grid.lava && self.accepted_commands.is_multiple_of(LAVA_EVERY) {
-                    grid.lava_rows = min(grid.lava_rows + 1, grid.tiles.len().saturating_sub(1));
-                }
                 if grid.player == grid.goal {
                     self.finish(
                         LevelResult::Clear,
                         "Patch delivered through the hot floor.".to_string(),
                     );
-                } else if grid.lava
-                    && grid.player.y >= grid.tiles.len().saturating_sub(grid.lava_rows)
-                {
+                } else if grid.player_in_lava() {
                     self.finish(
                         LevelResult::Defeat,
                         "The lava reached your boots.".to_string(),
@@ -979,6 +1010,16 @@ impl GameSession {
         if self.finished.is_some() {
             return;
         }
+        self.update_timed_hazards();
+        if let PlayState::Grid(grid) = &self.state
+            && grid.player_in_lava()
+        {
+            self.finish(
+                LevelResult::Defeat,
+                "The timed lava front caught the courier.".to_string(),
+            );
+            return;
+        }
         match &self.state {
             PlayState::Grid(grid) if self.accepted_commands >= grid.command_budget => {
                 self.finish(LevelResult::Defeat, "Command budget spent.".to_string());
@@ -1013,6 +1054,13 @@ impl GameSession {
         }
     }
 
+    fn update_timed_hazards(&mut self) {
+        let elapsed = self.elapsed();
+        if let PlayState::Grid(grid) = &mut self.state {
+            grid.update_lava(elapsed);
+        }
+    }
+
     fn finish(&mut self, result: LevelResult, message: String) {
         let hint = (result == LevelResult::Defeat)
             .then(|| self.hint())
@@ -1030,7 +1078,11 @@ impl GameSession {
 
     fn hint(&self) -> Option<String> {
         match &self.state {
-            PlayState::Grid(_) => hint_for_counts(&self.moves_history),
+            PlayState::Grid(grid) => hint_for_counts(&self.moves_history).or_else(|| {
+                grid.lava.then(|| {
+                    "Lava rises by real time now. Pre-plan long motions like `6k` or `8l` instead of waiting between single steps.".to_string()
+                })
+            }),
             PlayState::Token(_) => hint_for_words(&self.command_history),
             PlayState::Edit(edit) => hint_for_edits(edit),
         }
@@ -1093,7 +1145,36 @@ impl GridState {
             command_budget: spec.command_budget,
             lava_rows: usize::from(spec.lava),
             lava: spec.lava,
+            lava_interval: spec.lava_interval_ms.map(Duration::from_millis),
         }
+    }
+
+    fn update_lava(&mut self, elapsed: Duration) {
+        if let Some(interval) = self.lava_interval {
+            let interval_ms = interval.as_millis().max(1);
+            let elapsed_rows = elapsed.as_millis() / interval_ms;
+            self.lava_rows = min(
+                1 + elapsed_rows as usize,
+                self.tiles.len().saturating_sub(1),
+            );
+        }
+    }
+
+    fn player_in_lava(&self) -> bool {
+        self.lava && self.player.y >= self.tiles.len().saturating_sub(self.lava_rows)
+    }
+
+    fn lava_status(&self, elapsed: Duration) -> Option<String> {
+        self.lava_interval.map(|interval| {
+            let interval_ms = interval.as_millis().max(1);
+            let elapsed_ms = elapsed.as_millis();
+            let remaining_ms = interval_ms - (elapsed_ms % interval_ms);
+            format!(
+                " | Lava: {} rows, next rise in {:.1}s",
+                self.lava_rows,
+                remaining_ms as f32 / 1000.0
+            )
+        })
     }
 
     fn apply_motion(&mut self, kind: MotionKind, count: usize) {
@@ -1981,8 +2062,12 @@ fn draw_level(frame: &mut Frame<'_>, session: &GameSession, footer: Option<&str>
         },
         _ => "NORMAL",
     };
+    let hazard = match &session.state {
+        PlayState::Grid(grid) => grid.lava_status(session.elapsed()).unwrap_or_default(),
+        _ => String::new(),
+    };
     let bottom = format!(
-        "Mode: {mode} | Command: {} | Used: {}/{} | Vocabulary: {}{}",
+        "Mode: {mode} | Command: {} | Used: {}/{}{} | Vocabulary: {}{}",
         if session.input.is_empty() {
             "_".to_string()
         } else {
@@ -1990,6 +2075,7 @@ fn draw_level(frame: &mut Frame<'_>, session: &GameSession, footer: Option<&str>
         },
         session.accepted_commands,
         budget,
+        hazard,
         session.commands.help(),
         footer.map_or(String::new(), |text| format!(" | {text}"))
     );
@@ -2018,21 +2104,45 @@ fn draw_level(frame: &mut Frame<'_>, session: &GameSession, footer: Option<&str>
 
 fn draw_grid(frame: &mut Frame<'_>, area: Rect, grid: &GridState) {
     let mut lines = Vec::new();
-    for (y, row) in grid.tiles.iter().enumerate() {
+    let inner_width = area.width.saturating_sub(2) as usize;
+    let inner_height = area.height.saturating_sub(2) as usize;
+    let label_width = 5usize;
+    let visible_rows = inner_height.max(1).min(grid.tiles.len());
+    let visible_cols = ((inner_width.saturating_sub(label_width)) / 2)
+        .max(1)
+        .min(grid.tiles.first().map_or(0, Vec::len));
+    let y_start = viewport_start(grid.player.y, visible_rows, grid.tiles.len());
+    let x_start = viewport_start(
+        grid.player.x,
+        visible_cols,
+        grid.tiles.first().map_or(0, Vec::len),
+    );
+    let y_end = min(y_start + visible_rows, grid.tiles.len());
+    let x_end = min(
+        x_start + visible_cols,
+        grid.tiles.first().map_or(0, Vec::len),
+    );
+
+    for y in y_start..y_end {
+        let row = &grid.tiles[y];
         let mut spans = Vec::new();
-        for (x, tile) in row.iter().enumerate() {
+        spans.push(Span::styled(
+            relative_line_label(y, grid.player.y),
+            Style::default().fg(Color::DarkGray),
+        ));
+        for (x, tile) in row.iter().enumerate().take(x_end).skip(x_start) {
             let pos = Pos { x, y };
             let in_lava = grid.lava && y >= grid.tiles.len().saturating_sub(grid.lava_rows);
             let (glyph, color) = if pos == grid.player {
-                ("@", Color::Yellow)
+                ("@ ", Color::Yellow)
             } else if pos == grid.goal {
-                ("X", Color::Green)
+                ("X ", Color::Green)
             } else if in_lava {
-                ("~", Color::Red)
+                ("~~", Color::Red)
             } else if *tile == Tile::Wall {
-                ("#", Color::DarkGray)
+                ("##", Color::DarkGray)
             } else {
-                (".", Color::Gray)
+                (". ", Color::Gray)
             };
             spans.push(Span::styled(glyph, Style::default().fg(color)));
         }
@@ -2053,6 +2163,10 @@ fn draw_token(frame: &mut Frame<'_>, area: Rect, token: &TokenState) {
     let mut lines = Vec::new();
     for (y, line) in token.lines.iter().enumerate() {
         let mut spans = Vec::new();
+        spans.push(Span::styled(
+            relative_line_label(y, token.cursor.y),
+            Style::default().fg(Color::DarkGray),
+        ));
         for (x, ch) in line.chars().enumerate() {
             let pos = Pos { x, y };
             let mut style = Style::default().fg(Color::Gray);
@@ -2080,6 +2194,10 @@ fn draw_edit(frame: &mut Frame<'_>, area: Rect, edit: &EditState) {
     let mut buffer = Vec::new();
     for (y, line) in edit.lines.iter().enumerate() {
         let mut spans = Vec::new();
+        spans.push(Span::styled(
+            relative_line_label(y, edit.cursor.y),
+            Style::default().fg(Color::DarkGray),
+        ));
         for (x, ch) in line.chars().enumerate() {
             let mut style = Style::default().fg(Color::Gray);
             if edit.cursor == (Pos { x, y }) {
@@ -2095,11 +2213,15 @@ fn draw_edit(frame: &mut Frame<'_>, area: Rect, edit: &EditState) {
     let target: Vec<Line> = edit
         .expected
         .iter()
-        .map(|line| {
-            Line::from(Span::styled(
-                (*line).clone(),
-                Style::default().fg(Color::Green),
-            ))
+        .enumerate()
+        .map(|(y, line)| {
+            Line::from(vec![
+                Span::styled(
+                    format!("{:>3} ", y + 1),
+                    Style::default().fg(Color::DarkGray),
+                ),
+                Span::styled((*line).clone(), Style::default().fg(Color::Green)),
+            ])
         })
         .collect();
     frame.render_widget(
@@ -2110,6 +2232,22 @@ fn draw_edit(frame: &mut Frame<'_>, area: Rect, edit: &EditState) {
         Paragraph::new(target).block(Block::default().title("Target").borders(Borders::ALL)),
         chunks[1],
     );
+}
+
+fn viewport_start(cursor: usize, visible: usize, total: usize) -> usize {
+    if visible >= total {
+        0
+    } else {
+        cursor.saturating_sub(visible / 2).min(total - visible)
+    }
+}
+
+fn relative_line_label(row: usize, cursor_row: usize) -> String {
+    if row == cursor_row {
+        format!("{:>3} ", row + 1)
+    } else {
+        format!("{:>3} ", row.abs_diff(cursor_row))
+    }
 }
 
 fn render_title(frame: &mut Frame<'_>, area: Rect, title: &str, subtitle: &str) {
@@ -2238,6 +2376,48 @@ mod tests {
         assert_eq!(first.tiles, second.tiles);
         assert!(reachable(&first));
         assert!(first.lava);
+    }
+
+    #[test]
+    fn lesson_one_uses_larger_spaces_and_timed_lava() {
+        let catalog = Catalog::new();
+        let one_two = catalog.level("1-2").unwrap();
+        let one_three = catalog.level("1-3").unwrap();
+        let LevelKind::Grid(spec_two) = &one_two.kind else {
+            panic!("expected grid");
+        };
+        let LevelKind::Grid(spec_three) = &one_three.kind else {
+            panic!("expected grid");
+        };
+        assert!(spec_two.width >= 40);
+        assert!(spec_two.height >= 20);
+        assert!(spec_two.lava_interval_ms.is_some());
+        assert!(spec_three.width > spec_two.width);
+        assert!(spec_three.height > spec_two.height);
+        assert!(spec_three.lava_interval_ms.unwrap() < spec_two.lava_interval_ms.unwrap());
+    }
+
+    #[test]
+    fn lava_rises_from_elapsed_time_without_commands() {
+        let catalog = Catalog::new();
+        let level = catalog.level("1-2").unwrap();
+        let LevelKind::Grid(spec) = &level.kind else {
+            panic!("expected grid");
+        };
+        let mut grid = GridState::from_spec(spec, 99);
+        assert_eq!(grid.lava_rows, 1);
+        grid.update_lava(Duration::from_millis(
+            spec.lava_interval_ms.unwrap() * 2 + 10,
+        ));
+        assert_eq!(grid.lava_rows, 3);
+    }
+
+    #[test]
+    fn relative_line_labels_match_vim_style() {
+        assert_eq!(relative_line_label(4, 4), "  5 ");
+        assert_eq!(relative_line_label(3, 4), "  1 ");
+        assert_eq!(relative_line_label(1, 4), "  3 ");
+        assert_eq!(relative_line_label(7, 4), "  3 ");
     }
 
     #[test]
